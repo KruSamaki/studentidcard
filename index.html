@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student ID Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .card {
+            width: 320px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            border: 5px solid #000;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #4CAF50;
+            border-bottom-right-radius: 70px;
+        }
+        .card img {
+            width: 100px;
+            height: 100px;
+            /* border-radius: 50%; */
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .card h3 {
+            margin: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+        .card p {
+            margin: 5px 0;
+            color: #555;
+            position: relative;
+            z-index: 1;
+        }
+        .qr-code {
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="studentCard">
+    <img src="" alt="Student Photo" id="studentPhoto">
+    <h3 id="studentName"></h3>
+    <p id="studentClass"></p>
+    <p id="studentID"></p>
+    <img src="" alt="QR Code" class="qr-code" id="qrCode">
+</div>
+
+<script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const studentID = urlParams.get('id');
+
+    const apiEndpoint = 'https://sheetdb.io/api/v1/naehicxtq748e';
+
+    fetch(apiEndpoint)
+        .then(response => response.json())
+        .then(data => {
+            const student = data.find(s => s.ID === studentID);
+            if (student) {
+                document.getElementById('studentPhoto').src = student.PhotoURL;
+                document.getElementById('studentName').innerText = student.Name;
+                document.getElementById('studentClass').innerText = `Class: ${student.Class}`;
+                document.getElementById('studentID').innerText = `ID: ${student.ID}`;
+                document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${window.location.href}`;
+            } else {
+                document.getElementById('studentCard').innerHTML = '<p>Student not found.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            document.getElementById('studentCard').innerHTML = '<p>Error loading student data.</p>';
+        });
+</script>
+
+</body>
+</html>
